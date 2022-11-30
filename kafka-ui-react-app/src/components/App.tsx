@@ -7,7 +7,7 @@ import Dashboard from 'components/Dashboard/Dashboard';
 import ClusterPage from 'components/Cluster/Cluster';
 import Version from 'components/Version/Version';
 import { ThemeProvider } from 'styled-components';
-import theme from 'theme/theme';
+import { theme, darkTheme } from 'theme/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { showServerError } from 'lib/errorHandling';
 import { Toaster } from 'react-hot-toast';
@@ -20,6 +20,9 @@ import DiscordIcon from 'components/common/Icons/DiscordIcon';
 import ConfirmationModal from './common/ConfirmationModal/ConfirmationModal';
 import { ConfirmContextProvider } from './contexts/ConfirmContext';
 import { GlobalSettingsProvider } from './contexts/GlobalSettingsContext';
+import Switch from './common/Switch/Switch';
+import SunIcon from './common/Icons/SunIcon';
+import MoonIcon from './common/Icons/MoonIcon';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,15 +42,30 @@ const App: React.FC = () => {
   const onBurgerClick = () => setIsSidebarVisible(!isSidebarVisible);
   const closeSidebar = useCallback(() => setIsSidebarVisible(false), []);
   const location = useLocation();
+  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     closeSidebar();
   }, [location, closeSidebar]);
 
+  React.useLayoutEffect(() => {
+    const dark = JSON.parse(localStorage.getItem('darkMode') as string);
+    setIsDarkMode(dark);
+  }, []);
+
+  const handleSwitch = () => {
+    if (isDarkMode) {
+      localStorage.setItem('darkMode', 'false');
+      setIsDarkMode(false);
+    } else {
+      localStorage.setItem('darkMode', 'true');
+      setIsDarkMode(true);
+    }
+  };
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalSettingsProvider>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
           <ConfirmContextProvider>
             <GlobalCSS />
             <S.Layout>
@@ -77,6 +95,13 @@ const App: React.FC = () => {
                   </S.NavbarBrand>
                 </S.NavbarBrand>
                 <S.NavbarSocial>
+                  <Switch
+                    name="switchRoundedDefault"
+                    checked={isDarkMode}
+                    onChange={handleSwitch}
+                    checkedIcon={<MoonIcon />}
+                    unCheckedIcon={<SunIcon />}
+                  />
                   <S.LogoutLink href="/logout">
                     <S.LogoutButton buttonType="primary" buttonSize="M">
                       Log out
