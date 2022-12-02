@@ -230,10 +230,13 @@ export const Hyperlink = styled(Link)(
     font-weight: bold;
     font-size: 12px;
     line-height: 16px;
-    color: ${theme.menu.color.active};
+    color: ${theme.hyperlink.color};
     text-decoration: none;
     word-break: break-word;
     cursor: pointer;
+    &:hover {
+      color: ${theme.hyperlink.color};
+    }
   `
 );
 
