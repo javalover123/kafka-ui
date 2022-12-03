@@ -24,70 +24,73 @@ const MessagesTable: React.FC = () => {
   const messages = useAppSelector(getTopicMessges);
   const isFetching = useAppSelector(getIsTopicMessagesFetching);
   return (
-    <Table isFullwidth>
-      <thead>
-        <tr>
-          <TableHeaderCell> </TableHeaderCell>
-          <TableHeaderCell title="Offset" />
-          <TableHeaderCell title="Partition" />
-          <TableHeaderCell title="Timestamp" />
-          <TableHeaderCell
-            title="Key"
-            previewText={`Preview ${
-              keyFilters.length ? `(${keyFilters.length} selected)` : ''
-            }`}
-            onPreview={() => setPreviewFor('key')}
-          />
-          <TableHeaderCell
-            title="Value"
-            previewText={`Preview ${
-              contentFilters.length ? `(${contentFilters.length} selected)` : ''
-            }`}
-            onPreview={() => setPreviewFor('content')}
-          />
-          <TableHeaderCell> </TableHeaderCell>
-
-          {previewFor !== null && (
-            <PreviewModal
-              values={previewFor === 'key' ? keyFilters : contentFilters}
-              toggleIsOpen={() => setPreviewFor(null)}
-              setFilters={(payload: PreviewFilter[]) =>
-                previewFor === 'key'
-                  ? setKeyFilters(payload)
-                  : setContentFilters(payload)
-              }
+    <div style={{ position: 'relative' }}>
+      {previewFor !== null && (
+        <PreviewModal
+          values={previewFor === 'key' ? keyFilters : contentFilters}
+          toggleIsOpen={() => setPreviewFor(null)}
+          setFilters={(payload: PreviewFilter[]) =>
+            previewFor === 'key'
+              ? setKeyFilters(payload)
+              : setContentFilters(payload)
+          }
+        />
+      )}
+      <Table isFullwidth>
+        <thead>
+          <tr>
+            <TableHeaderCell> </TableHeaderCell>
+            <TableHeaderCell title="Offset" />
+            <TableHeaderCell title="Partition" />
+            <TableHeaderCell title="Timestamp" />
+            <TableHeaderCell
+              title="Key"
+              previewText={`Preview ${
+                keyFilters.length ? `(${keyFilters.length} selected)` : ''
+              }`}
+              onPreview={() => setPreviewFor('key')}
             />
+            <TableHeaderCell
+              title="Value"
+              previewText={`Preview ${
+                contentFilters.length
+                  ? `(${contentFilters.length} selected)`
+                  : ''
+              }`}
+              onPreview={() => setPreviewFor('content')}
+            />
+            <TableHeaderCell> </TableHeaderCell>
+          </tr>
+        </thead>
+        <tbody>
+          {messages.map((message: TopicMessage) => (
+            <Message
+              key={[
+                message.offset,
+                message.timestamp,
+                message.key,
+                message.partition,
+              ].join('-')}
+              message={message}
+              keyFilters={keyFilters}
+              contentFilters={contentFilters}
+            />
+          ))}
+          {isFetching && isLive && !messages.length && (
+            <tr>
+              <td colSpan={10}>
+                <PageLoader />
+              </td>
+            </tr>
           )}
-        </tr>
-      </thead>
-      <tbody>
-        {messages.map((message: TopicMessage) => (
-          <Message
-            key={[
-              message.offset,
-              message.timestamp,
-              message.key,
-              message.partition,
-            ].join('-')}
-            message={message}
-            keyFilters={keyFilters}
-            contentFilters={contentFilters}
-          />
-        ))}
-        {isFetching && isLive && !messages.length && (
-          <tr>
-            <td colSpan={10}>
-              <PageLoader />
-            </td>
-          </tr>
-        )}
-        {messages.length === 0 && !isFetching && (
-          <tr>
-            <td colSpan={10}>No messages found</td>
-          </tr>
-        )}
-      </tbody>
-    </Table>
+          {messages.length === 0 && !isFetching && (
+            <tr>
+              <td colSpan={10}>No messages found</td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 
