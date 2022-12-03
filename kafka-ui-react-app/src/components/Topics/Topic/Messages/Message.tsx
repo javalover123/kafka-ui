@@ -89,9 +89,9 @@ const Message: React.FC<Props> = ({
     return (
       <>
         {filters.map((item) => (
-          <div>
+          <span key={`${item.path}--${item.field}`}>
             {item.field}: {get(parsedJson, item.path)}
-          </div>
+          </span>
         ))}
       </>
     );
@@ -117,7 +117,7 @@ const Message: React.FC<Props> = ({
         <StyledDataCell title={key}>
           {renderFilteredJson(key, keyFilters)}
         </StyledDataCell>
-        <StyledDataCell>
+        <StyledDataCell title={content}>
           <S.Metadata>
             <S.MetadataValue>
               {renderFilteredJson(content, contentFilters)}
